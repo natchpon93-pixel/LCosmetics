@@ -58,24 +58,34 @@ public final class NexoHook {
     /**
      * อ่านค่า material จาก config — รองรับทั้ง {@code nexo:id} และชื่อ vanilla
      *
+     * @param quiet true = ไม่ต้อง log เตือน (ใช้ตอนโหลดรอบแรกที่ Nexo อาจยังไม่พร้อม)
      * @return null ถ้าแปลงไม่ได้
      */
-    public ItemStack resolve(String raw) {
+    public ItemStack resolve(String raw, boolean quiet) {
         if (raw == null || raw.isBlank()) return null;
         String value = raw.trim();
         if (value.regionMatches(true, 0, "nexo:", 0, 5)) {
             String id = value.substring(5);
             ItemStack fromNexo = build(id);
-            if (fromNexo == null) {
+            if (fromNexo == null && !quiet) {
                 log.warning("[LCosmetics] ไม่พบ Nexo item: " + id);
             }
             return fromNexo;
         }
         Material mat = Material.matchMaterial(value.toUpperCase());
         if (mat == null) {
-            log.warning("[LCosmetics] material ไม่ถูกต้อง: " + value);
+            if (!quiet) log.warning("[LCosmetics] material ไม่ถูกต้อง: " + value);
             return null;
         }
         return new ItemStack(mat);
+    }
+
+    public ItemStack resolve(String raw) {
+        return resolve(raw, false);
+    }
+
+    /** true ถ้าค่านี้ต้องรอ Nexo โหลดเสร็จก่อนจึงจะ resolve ได้ */
+    public static boolean needsNexo(String raw) {
+        return raw != null && raw.trim().regionMatches(true, 0, "nexo:", 0, 5);
     }
 }

@@ -41,6 +41,10 @@ public final class CosmeticRegistry {
     private Map<String, Cosmetic> byId = Collections.emptyMap();
     /** slot -> cosmetics ในช่องนั้น (เรียงตาม config) */
     private Map<CosmeticSlot, List<Cosmetic>> bySlot = Collections.emptyMap();
+    /** จำนวนชิ้นที่ข้ามไปเพราะ Nexo ยังไม่พร้อม */
+    private int awaitingNexo = 0;
+    /** ปิด log เตือนตอนโหลดรอบแรก */
+    private boolean quiet = false;
 
     public CosmeticRegistry(Logger log, NexoHook nexo) {
         this.log = log;
@@ -48,6 +52,15 @@ public final class CosmeticRegistry {
     }
 
     public void load(File file) {
+        load(file, false);
+    }
+
+    /**
+     * @param quiet true = ไม่ log เตือนตอน resolve ไม่ได้
+     *              (ใช้ตอนโหลดรอบแรกที่ Nexo อาจยังไม่ประกาศ item เสร็จ)
+     */
+    public void load(File file, boolean quiet) {
+        this.quiet = quiet;
         Map<String, Cosmetic> ids = new LinkedHashMap<>();
         Map<CosmeticSlot, List<Cosmetic>> slots = new LinkedHashMap<>();
         for (CosmeticSlot slot : CosmeticSlot.values()) {
@@ -56,6 +69,7 @@ public final class CosmeticRegistry {
 
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
         int skipped = 0;
+        int pendingNexo = 0;
         for (String id : yaml.getKeys(false)) {
             ConfigurationSection sec = yaml.getConfigurationSection(id);
             if (sec == null) {
@@ -65,6 +79,10 @@ public final class CosmeticRegistry {
             Cosmetic cosmetic = read(id, sec);
             if (cosmetic == null) {
                 skipped++;
+                ConfigurationSection itemSec = sec.getConfigurationSection("item");
+                if (itemSec != null && NexoHook.needsNexo(itemSec.getString("material"))) {
+                    pendingNexo++;
+                }
                 continue;
             }
             ids.put(id.toLowerCase(), cosmetic);
@@ -75,21 +93,33 @@ public final class CosmeticRegistry {
         Map<CosmeticSlot, List<Cosmetic>> frozen = new LinkedHashMap<>();
         slots.forEach((slot, list) -> frozen.put(slot, List.copyOf(list)));
         this.bySlot = Collections.unmodifiableMap(frozen);
+        this.awaitingNexo = pendingNexo;
 
-        log.info("[LCosmetics] โหลด cosmetic " + ids.size() + " ชิ้น"
-                + (skipped > 0 ? " (ข้าม " + skipped + " ชิ้นที่ config ผิด)" : ""));
+        if (!quiet) {
+            log.info("[LCosmetics] โหลด cosmetic " + ids.size() + " ชิ้น"
+                    + (skipped > 0 ? " (ข้าม " + skipped + " ชิ้นที่ config ผิด)" : ""));
+        }
+    }
+
+    /** จำนวนชิ้นที่โหลดไม่ได้เพราะรอ Nexo — ใช้ตัดสินว่าต้องโหลดซ้ำไหม */
+    public int awaitingNexo() {
+        return awaitingNexo;
+    }
+
+    private void warn(String message) {
+        if (!quiet) log.warning("[LCosmetics] " + message);
     }
 
     private Cosmetic read(String id, ConfigurationSection sec) {
         CosmeticSlot slot = CosmeticSlot.parse(sec.getString("slot"));
         if (slot == null) {
-            log.warning("[LCosmetics] '" + id + "' slot ไม่ถูกต้อง: " + sec.getString("slot"));
+            warn("'" + id + "' slot ไม่ถูกต้อง: " + sec.getString("slot"));
             return null;
         }
 
         ConfigurationSection itemSec = sec.getConfigurationSection("item");
         if (itemSec == null) {
-            log.warning("[LCosmetics] '" + id + "' ไม่มี section 'item'");
+            warn("'" + id + "' ไม่มี section 'item'");
             return null;
         }
         ItemStack visual = buildItem(id, itemSec);
@@ -113,9 +143,9 @@ public final class CosmeticRegistry {
     }
 
     private ItemStack buildItem(String label, ConfigurationSection sec) {
-        ItemStack stack = nexo.resolve(sec.getString("material"));
+        ItemStack stack = nexo.resolve(sec.getString("material"), quiet);
         if (stack == null) {
-            log.warning("[LCosmetics] '" + label + "' สร้าง item ไม่ได้ ข้ามชิ้นนี้");
+            warn("'" + label + "' สร้าง item ไม่ได้ ข้ามชิ้นนี้");
             return null;
         }
         stack.setAmount(Math.max(1, sec.getInt("amount", 1)));

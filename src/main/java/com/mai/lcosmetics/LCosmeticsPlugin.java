@@ -53,7 +53,7 @@ public final class LCosmeticsPlugin extends JavaPlugin {
         this.displays = new DisplayRenderer(this);
         this.service = new CosmeticService(this, users, registry, store, displays);
 
-        registry.load(new File(getDataFolder(), "cosmetics.yml"));
+        registry.load(new File(getDataFolder(), "cosmetics.yml"), nexo.isAvailable());
 
         this.packetListener = new EquipmentPacketListener(users);
         PacketEvents.getAPI().getEventManager().registerListener(packetListener);
@@ -61,6 +61,8 @@ public final class LCosmeticsPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(
                 new PlayerListener(this, service, displays), this);
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
+
+        hookNexoReload();
 
         CosmeticsCommand command = new CosmeticsCommand(this, service);
         var registered = getCommand("lcosmetics");
@@ -76,8 +78,7 @@ public final class LCosmeticsPlugin extends JavaPlugin {
             service.handleJoin(player);
         }
 
-        getLogger().info("[LCosmetics] เปิดใช้งานแล้ว — เครื่องแต่งกาย " + registry.size() + " ชิ้น"
-                + (nexo.isAvailable() ? ", เชื่อมต่อ Nexo แล้ว" : ", ไม่พบ Nexo (ใช้ได้แค่ item vanilla)"));
+        getLogger().info("[LCosmetics] เปิดใช้งานแล้ว v" + getPluginMeta().getVersion());
     }
 
     @Override
@@ -112,12 +113,53 @@ public final class LCosmeticsPlugin extends JavaPlugin {
     /** ใช้โดย /lcosmetics reload */
     public void reloadEverything() {
         reloadConfig();
-        registry.load(new File(getDataFolder(), "cosmetics.yml"));
+        registry.load(new File(getDataFolder(), "cosmetics.yml"), false);
         // ของที่ผู้เล่นใส่อยู่อ้างถึง Cosmetic ตัวเก่า -> วาดใหม่ให้ตรง config ใหม่
         for (Player player : getServer().getOnlinePlayers()) {
             service.handleQuit(player);
             service.handleJoin(player);
         }
+    }
+
+    /**
+     * ผูก NexoItemsLoadedEvent เพื่อโหลด cosmetics ซ้ำเมื่อ Nexo พร้อม
+     *
+     * <p>Nexo ประกาศ item แบบ async หลังเซิร์ฟขึ้นเสร็จ — plugin เราเปิดก่อนหน้านั้น
+     * จึงต้องรอ event นี้แล้วค่อยอ่าน config รอบจริง ไม่ใช่เดาเวลาด้วย delay
+     */
+    private void hookNexoReload() {
+        if (!nexo.isAvailable()) {
+            // ไม่มี Nexo -> รอบแรกคือรอบจริงอยู่แล้ว แค่ log ผลออกมา
+            logLoadResult();
+            return;
+        }
+        try {
+            getServer().getPluginManager().registerEvents(
+                    new com.mai.lcosmetics.hook.NexoReloadListener(this::onNexoItemsReady), this);
+        } catch (Throwable t) {
+            getLogger().warning("[LCosmetics] ผูก NexoItemsLoadedEvent ไม่ได้: " + t.getMessage()
+                    + " — ใช้ /cos reload หลังเซิร์ฟขึ้นเสร็จแทน");
+            logLoadResult();
+        }
+    }
+
+    /** Nexo ประกาศ item ครบแล้ว -> โหลด cosmetics ใหม่ให้เห็นของจริง */
+    private void onNexoItemsReady() {
+        registry.load(new File(getDataFolder(), "cosmetics.yml"), false);
+        logLoadResult();
+        // คนที่ออนไลน์อยู่ต้องได้ cosmetic ที่เพิ่ง resolve ได้
+        for (Player player : getServer().getOnlinePlayers()) {
+            CosmeticUser user = users.get(player);
+            if (user == null) continue;
+            player.getScheduler().run(this, task -> {
+                if (player.isOnline()) service.renderAll(player, user);
+            }, null);
+        }
+    }
+
+    private void logLoadResult() {
+        getLogger().info("[LCosmetics] พร้อมใช้งาน — เครื่องแต่งกาย " + registry.size() + " ชิ้น"
+                + (nexo.isAvailable() ? ", เชื่อมต่อ Nexo แล้ว" : ", ไม่พบ Nexo (ใช้ได้แค่ item vanilla)"));
     }
 
     private void saveResourceIfMissing(String name) {
