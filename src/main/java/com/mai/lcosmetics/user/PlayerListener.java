@@ -9,6 +9,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -47,6 +48,23 @@ public final class PlayerListener implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
+        player.getScheduler().runDelayed(plugin, task -> {
+            if (!player.isOnline()) return;
+            CosmeticUser user = service.users().get(player);
+            if (user != null) service.renderAll(player, user);
+        }, null, 2L);
+    }
+
+    /**
+     * ย้ายโลก -> ต้อง spawn display ใหม่ในโลกใหม่
+     *
+     * <p>display entity อยู่ในโลกเดิมและถูกลบไปกับการย้าย นอกจากนั้นชนิด client
+     * ของคนในโลกใหม่อาจต่างกัน (Java/Bedrock) จึงต้องวาดใหม่ทั้งชุด
+     */
+    @EventHandler
+    public void onWorldChange(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+        displays.removeAll(player);
         player.getScheduler().runDelayed(plugin, task -> {
             if (!player.isOnline()) return;
             CosmeticUser user = service.users().get(player);

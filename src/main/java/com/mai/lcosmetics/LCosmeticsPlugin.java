@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.mai.lcosmetics.command.CosmeticsCommand;
 import com.mai.lcosmetics.cosmetic.CosmeticRegistry;
 import com.mai.lcosmetics.gui.MenuListener;
+import com.mai.lcosmetics.hook.BedrockHook;
 import com.mai.lcosmetics.hook.NexoHook;
 import com.mai.lcosmetics.render.DisplayRenderer;
 import com.mai.lcosmetics.render.EquipmentPacketListener;
@@ -28,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 public final class LCosmeticsPlugin extends JavaPlugin {
 
     private NexoHook nexo;
+    private BedrockHook bedrock;
     private CosmeticRegistry registry;
     private UserManager users;
     private PlayerDataStore store;
@@ -47,10 +49,11 @@ public final class LCosmeticsPlugin extends JavaPlugin {
         }
 
         this.nexo = new NexoHook(getLogger());
+        this.bedrock = new BedrockHook(getLogger());
         this.registry = new CosmeticRegistry(getLogger(), nexo);
         this.users = new UserManager();
         this.store = new PlayerDataStore(new File(getDataFolder(), "playerdata"), getLogger());
-        this.displays = new DisplayRenderer(this);
+        this.displays = new DisplayRenderer(this, bedrock);
         this.service = new CosmeticService(this, users, registry, store, displays);
 
         registry.load(new File(getDataFolder(), "cosmetics.yml"), nexo.isAvailable());
@@ -159,7 +162,10 @@ public final class LCosmeticsPlugin extends JavaPlugin {
 
     private void logLoadResult() {
         getLogger().info("[LCosmetics] พร้อมใช้งาน — เครื่องแต่งกาย " + registry.size() + " ชิ้น"
-                + (nexo.isAvailable() ? ", เชื่อมต่อ Nexo แล้ว" : ", ไม่พบ Nexo (ใช้ได้แค่ item vanilla)"));
+                + (nexo.isAvailable() ? ", เชื่อมต่อ Nexo แล้ว" : ", ไม่พบ Nexo (ใช้ได้แค่ item vanilla)")
+                + (bedrock.isAvailable()
+                        ? ", รองรับ Bedrock แล้ว (เป้/ปีก/ลูกโป่งเห็นทั้ง Java และ Bedrock)"
+                        : ", ไม่พบ Floodgate (ผู้เล่น Bedrock จะไม่เห็นเป้/ปีก/ลูกโป่ง)"));
     }
 
     private void saveResourceIfMissing(String name) {

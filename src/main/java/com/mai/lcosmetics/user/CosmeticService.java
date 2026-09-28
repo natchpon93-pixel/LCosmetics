@@ -49,6 +49,38 @@ public final class CosmeticService {
                 renderAll(player, user);
             }, null);
         });
+        // คนที่อยู่ในโลกนี้แล้วอาจยังไม่มีร่างที่ client ของคนใหม่มองเห็น
+        // (Java เห็นแค่ ItemDisplay, Bedrock เห็นแค่ ArmorStand)
+        refreshDisplaysFor(player);
+    }
+
+    /**
+     * วาด display cosmetic ของคนอื่นในโลกใหม่ เมื่อมีผู้เล่นเข้ามา
+     *
+     * <p>จำเป็นเพราะร่าง ItemDisplay / ArmorStand ถูก spawn ตามชนิด client
+     * ที่อยู่ในโลก **ตอนนั้น** — คนที่เข้ามาทีหลังอาจเป็น client อีกชนิด
+     * และยังไม่มีร่างที่ตัวเองมองเห็น
+     *
+     * <p>ทำงานเฉพาะคนที่ใส่ cosmetic ช่อง display อยู่จริง จึงไม่กินทรัพยากร
+     * เมื่อไม่มีใครใส่
+     */
+    private void refreshDisplaysFor(Player joined) {
+        for (Player other : joined.getWorld().getPlayers()) {
+            if (other.getUniqueId().equals(joined.getUniqueId())) continue;
+            CosmeticUser user = users.get(other);
+            if (user == null || user.isHidden()) continue;
+
+            Map<CosmeticSlot, Cosmetic> worn = user.snapshot();
+            boolean hasDisplay = worn.keySet().stream().anyMatch(slot -> !slot.isEquipment());
+            if (!hasDisplay) continue;
+
+            other.getScheduler().run(plugin, t -> {
+                if (!other.isOnline()) return;
+                worn.forEach((slot, cosmetic) -> {
+                    if (!slot.isEquipment()) displays.apply(other, slot, cosmetic);
+                });
+            }, null);
+        }
     }
 
     /** ผู้เล่นออก — เก็บ entity ทันที แล้วเซฟ async */
