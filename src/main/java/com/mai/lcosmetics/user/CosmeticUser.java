@@ -109,7 +109,13 @@ public final class CosmeticUser {
 
     /** สลับสถานะและคืนค่าใหม่ */
     public boolean toggleHidden() {
-        return hidden.updateAndGet(v -> !v);
+        // AtomicBoolean ไม่มี updateAndGet — วน CAS จนสำเร็จ
+        while (true) {
+            boolean current = hidden.get();
+            if (hidden.compareAndSet(current, !current)) {
+                return !current;
+            }
+        }
     }
 
     /** ดึงและเคลียร์ธง dirty ในการเรียกครั้งเดียว */
