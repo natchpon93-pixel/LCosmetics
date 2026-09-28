@@ -1,0 +1,32 @@
+name: LCosmetics
+version: '${version}'
+main: com.mai.lcosmetics.LCosmeticsPlugin
+api-version: '26.1'
+folia-supported: true
+load: POSTWORLD
+authors:
+  - Mai
+description: ระบบเครื่องแต่งกายสำหรับ Folia — หมวก เป้ ปีก ลูกโป่ง
+depend:
+  - packetevents
+softdepend:
+  - Nexo
+  - PlaceholderAPI
+  - LuckPerms
+commands:
+  lcosmetics:
+    description: เปิดเมนูเครื่องแต่งกาย
+    usage: /lcosmetics
+    aliases:
+      - cos
+      - lcos
+permissions:
+  lcosmetics.command.menu.other:
+    description: เปิดเมนูให้ผู้เล่นคนอื่น
+    default: op
+  lcosmetics.command.apply.other:
+    description: ใส่เครื่องแต่งกายให้ผู้เล่นคนอื่น
+    default: op
+  lcosmetics.command.reload:
+    description: โหลด config ใหม่
+    default: op

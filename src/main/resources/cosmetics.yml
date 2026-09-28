@@ -1,0 +1,199 @@
+# ═══════════════════════════════════════════════════════════
+#  LCosmetics — รายการเครื่องแต่งกาย
+# ═══════════════════════════════════════════════════════════
+#
+#  วิธีเพิ่มของใหม่:
+#
+#  ไอดีของคุณ:                  ← ชื่อที่ใช้ในคำสั่ง /cos apply <ไอดี>
+#    slot: HELMET               ← ใส่ช่องไหน (ดูรายการด้านล่าง)
+#    permission: "lcosmetics.ไอดี"   ← เว้นว่าง = ทุกคนใช้ได้
+#    item:
+#      material: nexo:ชื่อไอเทม  ← ของจาก Nexo, หรือใส่ชื่อ vanilla เช่น DIAMOND_HELMET
+#      name: "&bชื่อที่โชว์"
+#      lore:
+#        - "&7คำอธิบาย"
+#    firstperson-item:          ← ไม่จำเป็น: รูปที่เจ้าตัวเห็นเอง (เป้/ปีก มักใช้)
+#      material: nexo:ชื่อไอเทม_thirdperson
+#
+#  ช่องที่ใช้ได้:
+#    HELMET      หมวก          — คนอื่นเห็นทับหมวกจริง
+#    CHESTPLATE  เสื้อ
+#    LEGGINGS    กางเกง
+#    BOOTS       รองเท้า
+#    OFFHAND     ของถือมือซ้าย
+#    BACKPACK    เป้/ปีก        — เป็น display entity ติดหลัง
+#    BALLOON     ลูกโป่ง        — display entity ลอยเหนือหัว
+#
+#  เกราะจริงยังป้องกันปกติทุกกรณี — cosmetic แค่เปลี่ยนรูปที่คนอื่นเห็น
+# ═══════════════════════════════════════════════════════════
+
+# ───────── หมวก ─────────
+beanie:
+  slot: HELMET
+  permission: "lcosmetics.beanie"
+  item:
+    material: nexo:beanie
+    name: "<rainbow>หมวกไหมพรมสีรุ้ง</rainbow>"
+    lore:
+      - "&7หมวกกันหนาวสีสันสดใส"
+
+baseball_hat:
+  slot: HELMET
+  permission: "lcosmetics.baseball_hat"
+  item:
+    material: nexo:baseball_hat
+    name: "&bหมวกแก๊ป"
+    lore:
+      - "&7หมวกเบสบอลคลาสสิก"
+
+frog_hat:
+  slot: HELMET
+  permission: "lcosmetics.frog_hat"
+  item:
+    material: nexo:frog_hat
+    name: "&aหมวกกบ"
+    lore:
+      - "&7อ๊บ อ๊บ"
+
+hibiscus_flower:
+  slot: HELMET
+  permission: "lcosmetics.hibiscus_flower"
+  item:
+    material: nexo:hibiscus_flower
+    name: "&dดอกชบา"
+    lore:
+      - "&7ดอกไม้ทัดหูสไตล์ฮาวาย"
+
+# ───────── เป้ / ปีก ─────────
+backpack:
+  slot: BACKPACK
+  permission: "lcosmetics.backpack"
+  item:
+    material: nexo:backpack
+    name: "&9เป้สะพายหลัง"
+    lore:
+      - "&7เป้ใบเล็กสำหรับนักเดินทาง"
+  firstperson-item:
+    material: nexo:backpack_thirdperson
+
+explorer_backpack:
+  slot: BACKPACK
+  permission: "lcosmetics.explorer_backpack"
+  dyeable: true
+  item:
+    material: nexo:explorer_backpack
+    name: "&fเป้นักสำรวจ"
+    lore:
+      - "&7เป้ใบใหญ่ ใส่ของได้เยอะ"
+      - "&8ย้อมสีได้"
+  firstperson-item:
+    material: nexo:explorer_backpack_thirdperson
+
+future_wings:
+  slot: BACKPACK
+  permission: "lcosmetics.future_wings"
+  item:
+    material: nexo:future_wings
+    name: "&dปีกแห่งอนาคต"
+    lore:
+      - "&7ปีกเรืองแสงจากโลกอนาคต"
+  firstperson-item:
+    material: nexo:future_wings_thirdperson
+
+jetpack:
+  slot: BACKPACK
+  permission: "lcosmetics.jetpack"
+  item:
+    material: nexo:jetpack
+    name: "&cเจ็ตแพ็ค"
+    lore:
+      - "&7จรวดติดหลัง เท่แบบไม่ต้องบินจริง"
+  firstperson-item:
+    material: nexo:jetpack_thirdperson
+
+# ───────── ของถือมือซ้าย ─────────
+lantern_cosmetic:
+  slot: OFFHAND
+  permission: "lcosmetics.lantern_cosmetic"
+  item:
+    material: nexo:lantern_cosmetic
+    name: "&eโคมไฟ"
+    lore:
+      - "&7โคมไฟถือเดินทาง"
+
+hammer:
+  slot: OFFHAND
+  permission: "lcosmetics.hammer"
+  item:
+    material: nexo:hammer
+    name: "&7ค้อนยักษ์"
+    lore:
+      - "&7ค้อนใบใหญ่ ไว้โชว์"
+
+earth_day_grabber:
+  slot: OFFHAND
+  permission: "lcosmetics.earth_day_grabber"
+  dyeable: true
+  item:
+    material: nexo:earth_day_grabber
+    name: "&aคีมคีบขยะ"
+    lore:
+      - "&7ช่วยกันรักษาโลก"
+      - "&8ย้อมสีได้"
+
+paintbrush:
+  slot: OFFHAND
+  permission: "lcosmetics.paintbrush"
+  item:
+    material: nexo:paintbrush
+    name: "&6พู่กัน"
+    lore:
+      - "&7สำหรับศิลปินตัวจริง"
+
+# ───────── ลูกโป่ง ─────────
+kite:
+  slot: BALLOON
+  permission: "lcosmetics.kite"
+  item:
+    material: nexo:kite_item
+    name: "&bว่าวลอยฟ้า"
+    lore:
+      - "&7ว่าวที่ลอยตามตัวคุณไปทุกที่"
+
+garbage_truck_balloon:
+  slot: BALLOON
+  permission: "lcosmetics.garbage_truck_balloon"
+  item:
+    material: nexo:garbage_truck_balloon
+    name: "&aลูกโป่งรถขยะ"
+    lore:
+      - "&7รถขยะลอยได้ แปลกแต่น่ารัก"
+
+# ───────── ชุดเกราะปลอม (ตัวอย่างใช้ item vanilla) ─────────
+diamond_set_chest:
+  slot: CHESTPLATE
+  permission: "lcosmetics.diamond_set"
+  item:
+    material: DIAMOND_CHESTPLATE
+    name: "&bเสื้อเพชร (เครื่องแต่งกาย)"
+    lore:
+      - "&7โชว์เสื้อเพชรโดยไม่ต้องมีจริง"
+      - "&8เกราะจริงยังป้องกันตามปกติ"
+
+diamond_set_legs:
+  slot: LEGGINGS
+  permission: "lcosmetics.diamond_set"
+  item:
+    material: DIAMOND_LEGGINGS
+    name: "&bกางเกงเพชร (เครื่องแต่งกาย)"
+    lore:
+      - "&8เกราะจริงยังป้องกันตามปกติ"
+
+diamond_set_boots:
+  slot: BOOTS
+  permission: "lcosmetics.diamond_set"
+  item:
+    material: DIAMOND_BOOTS
+    name: "&bรองเท้าเพชร (เครื่องแต่งกาย)"
+    lore:
+      - "&8เกราะจริงยังป้องกันตามปกติ"
