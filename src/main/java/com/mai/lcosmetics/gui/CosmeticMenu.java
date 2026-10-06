@@ -57,7 +57,7 @@ public final class CosmeticMenu implements InventoryHolder {
             index++;
         }
 
-        inventory.setItem(49, button(Material.BARRIER, "&cถอดของช่องนี้"));
+        inventory.setItem(49, button(Material.BARRIER, "<red>ถอดของช่องนี้"));
         player.openInventory(inventory);
     }
 
@@ -70,11 +70,11 @@ public final class CosmeticMenu implements InventoryHolder {
             meta.displayName(Text.parse(cosmetic.displayName()));
             List<String> lore = new ArrayList<>();
             if (!owned) {
-                lore.add("&cยังไม่มีสิทธิ์ใช้ชิ้นนี้");
+                lore.add("<red>ยังไม่มีสิทธิ์ใช้ชิ้นนี้");
             } else if (active) {
-                lore.add("&aใส่อยู่ &7— คลิกเพื่อถอด");
+                lore.add("<light_purple>ใส่อยู่ <gray>— คลิกเพื่อถอด");
             } else {
-                lore.add("&eคลิกเพื่อใส่");
+                lore.add("<light_purple>► คลิกเพื่อใส่");
             }
             meta.lore(lore.stream().map(Text::parse).toList());
             stack.setItemMeta(meta);
@@ -96,7 +96,7 @@ public final class CosmeticMenu implements InventoryHolder {
     public void handleClick(Player player, int rawSlot, ClickType click) {
         if (rawSlot == 49) {
             service.unequip(player, slot);
-            player.sendMessage(Text.parse("&7ถอด " + labelFor(slot) + " แล้ว"));
+            player.sendMessage(Text.parse("<gray>ถอด " + labelFor(slot) + " แล้ว"));
             open(player);
             return;
         }
@@ -108,11 +108,11 @@ public final class CosmeticMenu implements InventoryHolder {
 
         if (wornNow != null && wornNow.id().equals(clicked.id())) {
             service.unequip(player, slot);
-            player.sendMessage(Text.parse("&7ถอด " + clicked.displayName() + " &7แล้ว"));
+            player.sendMessage(Text.parse("<gray>ถอด " + clicked.displayName() + " แล้ว"));
         } else if (service.equip(player, clicked)) {
-            player.sendMessage(Text.parse("&aใส่ " + clicked.displayName() + " &aแล้ว"));
+            player.sendMessage(Text.parse("<light_purple><glyph:icon_crown> ใส่ " + clicked.displayName() + " แล้ว"));
         } else {
-            player.sendMessage(Text.parse("&cคุณยังไม่มีสิทธิ์ใช้ชิ้นนี้"));
+            player.sendMessage(Text.parse("<red>คุณยังไม่มีสิทธิ์ใช้ชิ้นนี้"));
             return;
         }
         open(player);
@@ -124,7 +124,7 @@ public final class CosmeticMenu implements InventoryHolder {
     }
 
     public static String titleFor(CosmeticSlot slot) {
-        return "&8เครื่องแต่งกาย — " + labelFor(slot);
+        return "<dark_purple>เครื่องแต่งกาย — " + labelFor(slot);
     }
 
     public static String labelFor(CosmeticSlot slot) {

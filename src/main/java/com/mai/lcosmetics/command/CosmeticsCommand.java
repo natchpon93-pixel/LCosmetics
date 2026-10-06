@@ -33,7 +33,7 @@ public final class CosmeticsCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             if (!(sender instanceof Player player)) {
-                sender.sendMessage("ใช้คำสั่งนี้ในเกมเท่านั้น");
+                sender.sendMessage(Text.parse("<gray><glyph:icon_crown> ใช้คำสั่งนี้ในเกมเท่านั้น"));
                 return true;
             }
             new MainMenu(service).open(player);
@@ -44,92 +44,92 @@ public final class CosmeticsCommand implements CommandExecutor, TabCompleter {
             case "menu" -> {
                 Player target = args.length > 1 ? Bukkit.getPlayerExact(args[1]) : asPlayer(sender);
                 if (target == null) {
-                    sender.sendMessage(Text.parse("&cไม่พบผู้เล่นคนนั้น"));
+                    sender.sendMessage(Text.parse("<red>ไม่พบผู้เล่นคนนั้น"));
                     return true;
                 }
                 if (target != sender && !sender.hasPermission("lcosmetics.command.menu.other")) {
-                    sender.sendMessage(Text.parse("&cคุณไม่มีสิทธิ์เปิดเมนูให้คนอื่น"));
+                    sender.sendMessage(Text.parse("<red>คุณไม่มีสิทธิ์เปิดเมนูให้คนอื่น"));
                     return true;
                 }
                 new MainMenu(service).open(target);
             }
             case "apply" -> {
                 if (args.length < 2) {
-                    sender.sendMessage(Text.parse("&cใช้: /" + label + " apply <id> [ผู้เล่น]"));
+                    sender.sendMessage(Text.parse("<red>ใช้: /" + label + " apply <id> [ผู้เล่น]"));
                     return true;
                 }
                 Cosmetic cosmetic = service.registry().get(args[1]);
                 if (cosmetic == null) {
-                    sender.sendMessage(Text.parse("&cไม่พบเครื่องแต่งกาย: " + args[1]));
+                    sender.sendMessage(Text.parse("<red>ไม่พบเครื่องแต่งกาย: " + args[1]));
                     return true;
                 }
                 Player target = args.length > 2 ? Bukkit.getPlayerExact(args[2]) : asPlayer(sender);
                 if (target == null) {
-                    sender.sendMessage(Text.parse("&cไม่พบผู้เล่นคนนั้น"));
+                    sender.sendMessage(Text.parse("<red>ไม่พบผู้เล่นคนนั้น"));
                     return true;
                 }
                 if (target != sender && !sender.hasPermission("lcosmetics.command.apply.other")) {
-                    sender.sendMessage(Text.parse("&cคุณไม่มีสิทธิ์ใส่ให้คนอื่น"));
+                    sender.sendMessage(Text.parse("<red>คุณไม่มีสิทธิ์ใส่ให้คนอื่น"));
                     return true;
                 }
                 if (service.equip(target, cosmetic)) {
-                    sender.sendMessage(Text.parse("&aใส่ " + cosmetic.displayName() + " &aให้ " + target.getName() + " แล้ว"));
+                    sender.sendMessage(Text.parse("<light_purple><glyph:icon_crown> ใส่ " + cosmetic.displayName() + " <light_purple>ให้ " + target.getName() + " แล้ว"));
                 } else {
-                    sender.sendMessage(Text.parse("&c" + target.getName() + " ไม่มีสิทธิ์ใช้ชิ้นนี้"));
+                    sender.sendMessage(Text.parse("<red>" + target.getName() + " ไม่มีสิทธิ์ใช้ชิ้นนี้"));
                 }
             }
             case "unapply" -> {
                 if (args.length < 2) {
-                    sender.sendMessage(Text.parse("&cใช้: /" + label + " unapply <ช่อง> [ผู้เล่น]"));
+                    sender.sendMessage(Text.parse("<red>ใช้: /" + label + " unapply <ช่อง> [ผู้เล่น]"));
                     return true;
                 }
                 CosmeticSlot slot = CosmeticSlot.parse(args[1]);
                 if (slot == null) {
-                    sender.sendMessage(Text.parse("&cช่องไม่ถูกต้อง: " + args[1]));
+                    sender.sendMessage(Text.parse("<red>ช่องไม่ถูกต้อง: " + args[1]));
                     return true;
                 }
                 Player target = args.length > 2 ? Bukkit.getPlayerExact(args[2]) : asPlayer(sender);
                 if (target == null) {
-                    sender.sendMessage(Text.parse("&cไม่พบผู้เล่นคนนั้น"));
+                    sender.sendMessage(Text.parse("<red>ไม่พบผู้เล่นคนนั้น"));
                     return true;
                 }
                 service.unequip(target, slot);
-                sender.sendMessage(Text.parse("&7ถอดของช่องนั้นให้ " + target.getName() + " แล้ว"));
+                sender.sendMessage(Text.parse("<gray>ถอดของช่องนั้นให้ " + target.getName() + " แล้ว"));
             }
             case "clear" -> {
                 Player target = args.length > 1 ? Bukkit.getPlayerExact(args[1]) : asPlayer(sender);
                 if (target == null) {
-                    sender.sendMessage(Text.parse("&cไม่พบผู้เล่นคนนั้น"));
+                    sender.sendMessage(Text.parse("<red>ไม่พบผู้เล่นคนนั้น"));
                     return true;
                 }
                 service.unequipAll(target);
-                sender.sendMessage(Text.parse("&7ถอดทั้งหมดของ " + target.getName() + " แล้ว"));
+                sender.sendMessage(Text.parse("<gray>ถอดทั้งหมดของ " + target.getName() + " แล้ว"));
             }
             case "toggle" -> {
                 Player player = asPlayer(sender);
                 if (player == null) {
-                    sender.sendMessage(Text.parse("&cใช้คำสั่งนี้ในเกมเท่านั้น"));
+                    sender.sendMessage(Text.parse("<red>ใช้คำสั่งนี้ในเกมเท่านั้น"));
                     return true;
                 }
                 boolean hidden = service.toggleHidden(player);
                 player.sendMessage(Text.parse(hidden
-                        ? "&7ซ่อนเครื่องแต่งกายแล้ว"
-                        : "&aแสดงเครื่องแต่งกายแล้ว"));
+                        ? "<gray>ซ่อนเครื่องแต่งกายแล้ว"
+                        : "<light_purple><glyph:icon_crown> แสดงเครื่องแต่งกายแล้ว"));
             }
             case "reload" -> {
                 if (!sender.hasPermission("lcosmetics.command.reload")) {
-                    sender.sendMessage(Text.parse("&cคุณไม่มีสิทธิ์ใช้คำสั่งนี้"));
+                    sender.sendMessage(Text.parse("<red>คุณไม่มีสิทธิ์ใช้คำสั่งนี้"));
                     return true;
                 }
                 plugin.reloadEverything();
-                sender.sendMessage(Text.parse("&aโหลด config ใหม่แล้ว — เครื่องแต่งกาย "
+                sender.sendMessage(Text.parse("<green>โหลด config ใหม่แล้ว <gray>— เครื่องแต่งกาย "
                         + service.registry().size() + " ชิ้น"));
             }
             case "list" -> {
-                sender.sendMessage(Text.parse("&eเครื่องแต่งกายทั้งหมด &7(" + service.registry().size() + ")"));
+                sender.sendMessage(Text.parse("<light_purple>เครื่องแต่งกายทั้งหมด <gray>(" + service.registry().size() + ")"));
                 for (Cosmetic cosmetic : service.registry().all()) {
-                    sender.sendMessage(Text.parse("&7- &f" + cosmetic.id()
-                            + " &8[" + cosmetic.slot().name() + "]"));
+                    sender.sendMessage(Text.parse("<gray>- <white>" + cosmetic.id()
+                            + " <dark_gray>[" + cosmetic.slot().name() + "]"));
                 }
             }
             default -> sendHelp(sender, label);
@@ -138,14 +138,14 @@ public final class CosmeticsCommand implements CommandExecutor, TabCompleter {
     }
 
     private void sendHelp(CommandSender sender, String label) {
-        sender.sendMessage(Text.parse("&e▸ คำสั่งเครื่องแต่งกาย"));
-        sender.sendMessage(Text.parse("&7/" + label + " &f— เปิดเมนู"));
-        sender.sendMessage(Text.parse("&7/" + label + " toggle &f— ซ่อน/แสดงของตัวเอง"));
-        sender.sendMessage(Text.parse("&7/" + label + " apply <id> [ผู้เล่น]"));
-        sender.sendMessage(Text.parse("&7/" + label + " unapply <ช่อง> [ผู้เล่น]"));
-        sender.sendMessage(Text.parse("&7/" + label + " clear [ผู้เล่น]"));
-        sender.sendMessage(Text.parse("&7/" + label + " list"));
-        sender.sendMessage(Text.parse("&7/" + label + " reload"));
+        sender.sendMessage(Text.parse("<light_purple><glyph:icon_crown> คำสั่งเครื่องแต่งกาย"));
+        sender.sendMessage(Text.parse("<gray>/" + label + " <white>— เปิดเมนู"));
+        sender.sendMessage(Text.parse("<gray>/" + label + " toggle <white>— ซ่อน/แสดงของตัวเอง"));
+        sender.sendMessage(Text.parse("<gray>/" + label + " apply <id> [ผู้เล่น]"));
+        sender.sendMessage(Text.parse("<gray>/" + label + " unapply <ช่อง> [ผู้เล่น]"));
+        sender.sendMessage(Text.parse("<gray>/" + label + " clear [ผู้เล่น]"));
+        sender.sendMessage(Text.parse("<gray>/" + label + " list"));
+        sender.sendMessage(Text.parse("<gray>/" + label + " reload"));
     }
 
     private Player asPlayer(CommandSender sender) {

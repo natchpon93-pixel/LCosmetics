@@ -49,17 +49,17 @@ public final class MainMenu implements InventoryHolder {
     }
 
     public void open(Player player) {
-        inventory = Bukkit.createInventory(this, 27, Text.parse("&8เครื่องแต่งกาย"));
+        inventory = Bukkit.createInventory(this, 27, Text.parse("<dark_purple><glyph:icon_crown> เครื่องแต่งกาย"));
 
         LAYOUT.forEach((index, slot) -> {
             int count = service.registry().inSlot(slot).size();
             ItemStack stack = new ItemStack(ICONS.getOrDefault(slot, Material.PAPER));
             ItemMeta meta = stack.getItemMeta();
             if (meta != null) {
-                meta.displayName(Text.parse("&f" + CosmeticMenu.labelFor(slot)));
+                meta.displayName(Text.parse("<white>" + CosmeticMenu.labelFor(slot)));
                 meta.lore(List.of(
-                        Text.parse("&7มีให้เลือก &e" + count + " &7ชิ้น"),
-                        Text.parse(count > 0 ? "&eคลิกเพื่อเปิด" : "&8ยังไม่มีของในช่องนี้")));
+                        Text.parse("<gray>มีให้เลือก <white>" + count + " <gray>ชิ้น"),
+                        Text.parse(count > 0 ? "<light_purple>► กดเพื่อเปิด" : "<dark_gray>ยังไม่มีของในช่องนี้")));
                 stack.setItemMeta(meta);
             }
             inventory.setItem(index, stack);
@@ -68,7 +68,7 @@ public final class MainMenu implements InventoryHolder {
         ItemStack clear = new ItemStack(Material.BARRIER);
         ItemMeta clearMeta = clear.getItemMeta();
         if (clearMeta != null) {
-            clearMeta.displayName(Text.parse("&cถอดทั้งหมด"));
+            clearMeta.displayName(Text.parse("<red>ถอดทั้งหมด"));
             clear.setItemMeta(clearMeta);
         }
         inventory.setItem(22, clear);
@@ -79,14 +79,14 @@ public final class MainMenu implements InventoryHolder {
     public void handleClick(Player player, int rawSlot) {
         if (rawSlot == 22) {
             service.unequipAll(player);
-            player.sendMessage(Text.parse("&7ถอดเครื่องแต่งกายทั้งหมดแล้ว"));
+            player.sendMessage(Text.parse("<gray>ถอดเครื่องแต่งกายทั้งหมดแล้ว"));
             open(player);
             return;
         }
         CosmeticSlot slot = LAYOUT.get(rawSlot);
         if (slot == null) return;
         if (service.registry().inSlot(slot).isEmpty()) {
-            player.sendMessage(Text.parse("&cยังไม่มีของในช่อง " + CosmeticMenu.labelFor(slot)));
+            player.sendMessage(Text.parse("<red>ยังไม่มีของในช่อง " + CosmeticMenu.labelFor(slot)));
             return;
         }
         new CosmeticMenu(slot, service).open(player);
